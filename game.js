@@ -167,10 +167,12 @@
       state.score = 0;
       state.lives = 3;
       state.level = 1;
+      resetActors();
+      setTitle();
+    } else {
+      resetActors();
+      setReady();
     }
-
-    resetActors();
-    setTitle();
   }
 
   function resetActors() {
@@ -814,12 +816,16 @@
   function drawFooter() {
     const y = HEADER + ROWS * TILE + 18;
     for (let i = 0; i < state.lives - 1; i++) {
-      ctx.fillStyle = COLORS.pacman;
-      ctx.beginPath();
-      ctx.moveTo(22 + i * 22, y);
-      ctx.arc(22 + i * 22, y, 8, 0.35, Math.PI * 2 - 0.35);
-      ctx.closePath();
-      ctx.fill();
+      if (ghostImg && ghostImg.complete) {
+        ctx.drawImage(ghostImg, 22 + i * 22 - 8, y - 8, 16, 16);
+      } else {
+        ctx.fillStyle = COLORS.pacman;
+        ctx.beginPath();
+        ctx.moveTo(22 + i * 22, y);
+        ctx.arc(22 + i * 22, y, 8, 0.35, Math.PI * 2 - 0.35);
+        ctx.closePath();
+        ctx.fill();
+      }
     }
 
     ctx.fillStyle = COLORS.text;
