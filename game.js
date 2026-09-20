@@ -876,6 +876,10 @@
     }
 
     ctx.fillStyle = COLORS.text;
+    ctx.font = "bold 24px Arial";
+    ctx.fillText("Fala Familia!", WIDTH / 2, HEIGHT / 2);
+
+    ctx.fillStyle = COLORS.text;
     ctx.font = "bold 16px Arial";
     ctx.fillText("APERTE QUALQUER TECLA PARA JOGAR", WIDTH / 2, HEIGHT - 40);
     ctx.font = "bold 14px Arial";
