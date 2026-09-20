@@ -43,7 +43,7 @@
     "     #.##..........##.#     ",
     "     #.##.###--###.##.#     ",
     "######.##.#      #.##.######",
-    "      ....#      #.P..      ",
+    "      ....#      #....      ",
     "######.##.#      #.##.######",
     "     #.##.########.##.#     ",
     "     #.##..........##.#     ",
@@ -82,7 +82,7 @@
     { name: "clyde", color: "#ffad38", start: { x: 15, y: 14 }, corner: { x: 1, y: 29 } }
   ];
 
-  const PACMAN_START = { x: 19, y: 15 };
+  const PACMAN_START = { x: 13, y: 22 };
   const GHOST_EXIT = { x: 13, y: 11 };
   const GHOST_HOME = { x: 13, y: 14 };
   const GHOST_EXIT_PATH = [
