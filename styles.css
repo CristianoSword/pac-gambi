@@ -1,0 +1,137 @@
+:root {
+  color-scheme: dark;
+  --page: #07070d;
+  --panel: #11131b;
+  --rim: #292b39;
+  --text: #f6f7ff;
+  --muted: #9ba4c4;
+  --accent: #ffd638;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 214, 56, 0.11), transparent 34rem),
+    linear-gradient(180deg, #07070d 0%, #0d0f17 100%);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+  touch-action: none;
+}
+
+.shell {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+}
+
+.cabinet {
+  width: min(100%, 520px);
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+}
+
+#game {
+  width: min(100%, calc(100svh * 0.778));
+  max-width: 448px;
+  aspect-ratio: 448 / 576;
+  display: block;
+  background: #000;
+  border: 1px solid var(--rim);
+  border-radius: 8px;
+  box-shadow:
+    0 22px 60px rgba(0, 0, 0, 0.42),
+    0 0 0 6px rgba(255, 255, 255, 0.03);
+  image-rendering: pixelated;
+}
+
+.mobile-controls {
+  --btn: clamp(46px, 14vw, 64px);
+  width: calc(var(--btn) * 3 + 18px);
+  height: calc(var(--btn) * 3 + 18px);
+  display: none;
+  grid-template-columns: repeat(3, var(--btn));
+  grid-template-rows: repeat(3, var(--btn));
+  gap: 9px;
+  user-select: none;
+}
+
+.pad-btn {
+  width: var(--btn);
+  height: var(--btn);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  background: linear-gradient(180deg, #202436 0%, #121522 100%);
+  color: var(--accent);
+  font-size: calc(var(--btn) * 0.42);
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.28);
+}
+
+.pad-btn:active {
+  transform: translateY(1px);
+  background: #262b40;
+}
+
+.pad-up {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.pad-left {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.pad-right {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.pad-down {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+@media (hover: none), (pointer: coarse), (max-width: 760px) {
+  .shell {
+    align-content: center;
+  }
+
+  #game {
+    width: min(100%, calc((100svh - 216px) * 0.778));
+  }
+
+  .mobile-controls {
+    display: grid;
+  }
+}
+
+@media (max-height: 700px) and (orientation: landscape) {
+  .cabinet {
+    grid-template-columns: auto auto;
+    width: min(100%, 760px);
+    gap: 18px;
+  }
+
+  #game {
+    width: min(60vw, calc(100svh - 24px));
+  }
+
+  .mobile-controls {
+    align-self: center;
+  }
+}

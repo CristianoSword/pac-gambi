@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Pac-Man Arcade</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="cabinet" aria-label="Jogo Pac-Man">
+        <canvas id="game" width="448" height="576" aria-label="Pac-Man em Canvas"></canvas>
+
+        <div class="mobile-controls" aria-label="Controles de toque">
+          <button class="pad-btn pad-up" data-dir="up" aria-label="Cima">▲</button>
+          <button class="pad-btn pad-left" data-dir="left" aria-label="Esquerda">◀</button>
+          <button class="pad-btn pad-right" data-dir="right" aria-label="Direita">▶</button>
+          <button class="pad-btn pad-down" data-dir="down" aria-label="Baixo">▼</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="game.js?v=20260920-ghost-fix"></script>
+  </body>
+</html>
