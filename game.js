@@ -116,6 +116,7 @@
   let audioCtx = null;
   let pacmanImg = null;
   let ghostImg = null;
+  let titleImg = null;
   const now = () => {
     const value = window.performance && typeof window.performance.now === "function"
       ? window.performance.now()
@@ -169,7 +170,7 @@
     }
 
     resetActors();
-    setReady();
+    setTitle();
   }
 
   function resetActors() {
@@ -192,6 +193,10 @@
       exitStep: 0,
       eaten: false
     }));
+  }
+
+  function setTitle() {
+    state.mode = "title";
   }
 
   function setReady() {
@@ -826,6 +831,10 @@
   function drawOverlays() {
     ctx.textAlign = "center";
 
+    if (state.mode === "title") {
+      drawTitleScreen();
+    }
+
     if (state.mode === "ready") {
       ctx.fillStyle = COLORS.pacman;
       ctx.font = "bold 18px Arial";
@@ -850,6 +859,23 @@
     }
   }
 
+  function drawTitleScreen() {
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+    if (titleImg && titleImg.complete) {
+      const imgWidth = WIDTH;
+      const imgHeight = HEIGHT - 60;
+      ctx.drawImage(titleImg, 0, 0, imgWidth, imgHeight);
+    }
+
+    ctx.fillStyle = COLORS.text;
+    ctx.font = "bold 16px Arial";
+    ctx.fillText("APERTE QUALQUER TECLA PARA JOGAR", WIDTH / 2, HEIGHT - 40);
+    ctx.font = "bold 14px Arial";
+    ctx.fillText("TOQUE A TELA PARA JOGAR", WIDTH / 2, HEIGHT - 20);
+  }
+
   function loop(timestamp) {
     const frameTime = Number.isFinite(timestamp) ? timestamp : now();
     const frame = Math.min((frameTime - lastTime) / 1000, 0.05);
@@ -869,12 +895,24 @@
     if (DIRS[key]) pacman.nextDir = DIRS[key];
     unlockAudio();
 
+    if (state.mode === "title") {
+      setReady();
+      return;
+    }
+
     if (state.mode === "game-over") {
       resetLevel(false);
     }
   }
 
   function handleKey(event) {
+    if (state.mode === "title") {
+      event.preventDefault();
+      unlockAudio();
+      setReady();
+      return;
+    }
+
     const keys = {
       ArrowLeft: "left",
       a: "left",
@@ -908,6 +946,13 @@
 
   function handleTouchStart(event) {
     unlockAudio();
+    
+    if (state.mode === "title") {
+      event.preventDefault();
+      setReady();
+      return;
+    }
+    
     const touch = event.changedTouches[0];
     touchStart = { x: touch.clientX, y: touch.clientY };
     if (state.mode === "game-over") resetLevel(false);
@@ -969,6 +1014,9 @@
   
   ghostImg = new Image();
   ghostImg.src = "fantasma.png";
+  
+  titleImg = new Image();
+  titleImg.src = "titulo.png";
   
   resetLevel(false);
   requestFrame(loop);
