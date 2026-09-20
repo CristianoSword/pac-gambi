@@ -878,9 +878,9 @@
     ctx.fillStyle = COLORS.text;
     ctx.font = "bold 24px Arial";
     ctx.strokeStyle = "#000";
-    ctx.lineWidth = 3;
-    ctx.strokeText("Fala Familia!", WIDTH / 2, HEIGHT / 2 + 20);
-    ctx.fillText("Fala Familia!", WIDTH / 2, HEIGHT / 2 + 20);
+    ctx.lineWidth = 6;
+    ctx.strokeText("Fala Familia!", WIDTH / 2, HEIGHT / 2 + 35);
+    ctx.fillText("Fala Familia!", WIDTH / 2, HEIGHT / 2 + 35);
 
     ctx.fillStyle = COLORS.text;
     ctx.font = "bold 16px Arial";
