@@ -114,6 +114,8 @@
   let pacman;
   let ghosts;
   let audioCtx = null;
+  let pacmanImg = null;
+  let ghostImg = null;
   const now = () => {
     const value = window.performance && typeof window.performance.now === "function"
       ? window.performance.now()
@@ -678,20 +680,34 @@
     if (!pacman) return;
 
     const p = actorToPixels(pacman);
-    const radius = TILE * 0.48;
-    let angle = Math.atan2(pacman.dir.y, pacman.dir.x);
-    if (pacman.dir.key === "none") angle = 0;
+    const size = TILE;
 
-    const bite = pacman.alive
-      ? 0.18 + Math.abs(Math.sin(pacman.mouth)) * 0.56
-      : Math.min(1.45, pacman.mouth * 0.25);
+    if (pacmanImg && pacmanImg.complete) {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      
+      let angle = Math.atan2(pacman.dir.y, pacman.dir.x);
+      if (pacman.dir.key === "none") angle = 0;
+      ctx.rotate(angle);
+      
+      ctx.drawImage(pacmanImg, -size / 2, -size / 2, size, size);
+      ctx.restore();
+    } else {
+      const radius = TILE * 0.48;
+      let angle = Math.atan2(pacman.dir.y, pacman.dir.x);
+      if (pacman.dir.key === "none") angle = 0;
 
-    ctx.fillStyle = COLORS.pacman;
-    ctx.beginPath();
-    ctx.moveTo(p.x, p.y);
-    ctx.arc(p.x, p.y, radius, angle + bite / 2, angle + Math.PI * 2 - bite / 2);
-    ctx.closePath();
-    ctx.fill();
+      const bite = pacman.alive
+        ? 0.18 + Math.abs(Math.sin(pacman.mouth)) * 0.56
+        : Math.min(1.45, pacman.mouth * 0.25);
+
+      ctx.fillStyle = COLORS.pacman;
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.arc(p.x, p.y, radius, angle + bite / 2, angle + Math.PI * 2 - bite / 2);
+      ctx.closePath();
+      ctx.fill();
+    }
   }
 
   function drawGhosts() {
@@ -711,43 +727,49 @@
 
   function drawGhost(ghost, color, scared = false) {
     const p = actorToPixels(ghost);
-    const r = TILE * 0.47;
-    const top = p.y - r;
-    const bottom = p.y + r;
-    const left = p.x - r;
-    const right = p.x + r;
+    const size = TILE;
 
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y - 1, r, Math.PI, 0);
-    ctx.lineTo(right, bottom - 3);
-    for (let i = 0; i < 3; i++) {
-      const x = right - (i + 0.5) * (r * 2 / 3);
-      ctx.lineTo(x, bottom - (i % 2 === 0 ? 0 : 5));
-    }
-    ctx.lineTo(left, bottom - 3);
-    ctx.lineTo(left, p.y - 1);
-    ctx.closePath();
-    ctx.fill();
+    if (ghostImg && ghostImg.complete && !scared) {
+      ctx.drawImage(ghostImg, p.x - size / 2, p.y - size / 2, size, size);
+    } else {
+      const r = TILE * 0.47;
+      const top = p.y - r;
+      const bottom = p.y + r;
+      const left = p.x - r;
+      const right = p.x + r;
 
-    if (scared) {
-      ctx.fillStyle = color === COLORS.frightenedFlash ? "#233cff" : "#f7f7ff";
+      ctx.fillStyle = color;
       ctx.beginPath();
-      ctx.arc(p.x - 4, p.y - 3, 1.5, 0, Math.PI * 2);
-      ctx.arc(p.x + 4, p.y - 3, 1.5, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y - 1, r, Math.PI, 0);
+      ctx.lineTo(right, bottom - 3);
+      for (let i = 0; i < 3; i++) {
+        const x = right - (i + 0.5) * (r * 2 / 3);
+        ctx.lineTo(x, bottom - (i % 2 === 0 ? 0 : 5));
+      }
+      ctx.lineTo(left, bottom - 3);
+      ctx.lineTo(left, p.y - 1);
+      ctx.closePath();
       ctx.fill();
-      ctx.strokeStyle = ctx.fillStyle;
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(p.x - 6, p.y + 6);
-      ctx.lineTo(p.x - 2, p.y + 3);
-      ctx.lineTo(p.x + 2, p.y + 6);
-      ctx.lineTo(p.x + 6, p.y + 3);
-      ctx.stroke();
-      return;
-    }
 
-    drawEyes(ghost);
+      if (scared) {
+        ctx.fillStyle = color === COLORS.frightenedFlash ? "#233cff" : "#f7f7ff";
+        ctx.beginPath();
+        ctx.arc(p.x - 4, p.y - 3, 1.5, 0, Math.PI * 2);
+        ctx.arc(p.x + 4, p.y - 3, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = ctx.fillStyle;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(p.x - 6, p.y + 6);
+        ctx.lineTo(p.x - 2, p.y + 3);
+        ctx.lineTo(p.x + 2, p.y + 6);
+        ctx.lineTo(p.x + 6, p.y + 3);
+        ctx.stroke();
+        return;
+      }
+
+      drawEyes(ghost);
+    }
   }
 
   function drawEyes(ghost) {
@@ -945,6 +967,13 @@
   canvas.width = WIDTH;
   canvas.height = HEIGHT;
   bindInput();
+  
+  pacmanImg = new Image();
+  pacmanImg.src = "water.png";
+  
+  ghostImg = new Image();
+  ghostImg.src = "fantasma.png";
+  
   resetLevel(false);
   requestFrame(loop);
 })();
