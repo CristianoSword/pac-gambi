@@ -683,15 +683,7 @@
     const size = TILE;
 
     if (pacmanImg && pacmanImg.complete) {
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      
-      let angle = Math.atan2(pacman.dir.y, pacman.dir.x);
-      if (pacman.dir.key === "none") angle = 0;
-      ctx.rotate(angle);
-      
-      ctx.drawImage(pacmanImg, -size / 2, -size / 2, size, size);
-      ctx.restore();
+      ctx.drawImage(pacmanImg, p.x - size / 2, p.y - size / 2, size, size);
     } else {
       const radius = TILE * 0.48;
       let angle = Math.atan2(pacman.dir.y, pacman.dir.x);
@@ -727,10 +719,14 @@
 
   function drawGhost(ghost, color, scared = false) {
     const p = actorToPixels(ghost);
-    const size = TILE;
+    const size = TILE * 3;
 
     if (ghostImg && ghostImg.complete && !scared) {
+      ctx.save();
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(ghostImg, p.x - size / 2, p.y - size / 2, size, size);
+      ctx.restore();
     } else {
       const r = TILE * 0.47;
       const top = p.y - r;
