@@ -5,7 +5,7 @@
   const ctx = canvas.getContext("2d");
 
   const COLS = 28;
-  const ROWS = 31;
+  const ROWS = 30;
   const TILE = 16;
   const HEADER = 48;
   const FOOTER = 32;
@@ -58,7 +58,6 @@
     "#.##########.##.##########.#",
     "#.##########.##.##########.#",
     "#..........................#",
-    "############################",
     "############################"
   ];
 
@@ -96,7 +95,13 @@
     maze: [],
     pellets: 0,
     score: 0,
-    highScore: Number(localStorage.getItem("pacmanHighScore") || 0),
+    highScore: (() => {
+      try {
+        return Number(localStorage.getItem("pacmanHighScore") || 0);
+      } catch (e) {
+        return 0;
+      }
+    })(),
     lives: 3,
     level: 1,
     mode: "ready",
@@ -199,6 +204,11 @@
 
   function setTitle() {
     state.mode = "title";
+    state.readyTimer = 2.2;
+    state.modeTimer = 0;
+    state.frightenedTimer = 0;
+    state.deathTimer = 0;
+    state.winTimer = 0;
   }
 
   function setReady() {
@@ -244,9 +254,20 @@
 
   function unlockAudio() {
     if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      } catch (e) {
+        console.warn("AudioContext not available:", e);
+        return;
+      }
     }
-    if (audioCtx.state === "suspended") audioCtx.resume();
+    if (audioCtx.state === "suspended") {
+      try {
+        audioCtx.resume();
+      } catch (e) {
+        console.warn("Failed to resume AudioContext:", e);
+      }
+    }
   }
 
   function tileAt(x, y) {
@@ -267,7 +288,8 @@
   }
 
   function isCentered(actor) {
-    return Math.abs(actor.x - Math.round(actor.x)) < 0.05 && Math.abs(actor.y - Math.round(actor.y)) < 0.05;
+    const threshold = actor.state === "eyes" ? 0.12 : 0.05;
+    return Math.abs(actor.x - Math.round(actor.x)) < threshold && Math.abs(actor.y - Math.round(actor.y)) < threshold;
   }
 
   function snap(actor) {
@@ -288,6 +310,8 @@
   }
 
   function moveActor(actor, dir, speed, dt, kind) {
+    if (dir.key === "none") return;
+
     if (isCentered(actor)) {
       snap(actor);
       if (!canMove(actor, dir, kind)) return;
@@ -353,7 +377,9 @@
 
     if (state.score > state.highScore) {
       state.highScore = state.score;
-      localStorage.setItem("pacmanHighScore", String(state.highScore));
+      try {
+        localStorage.setItem("pacmanHighScore", String(state.highScore));
+      } catch (e) {}
     }
   }
 
@@ -393,6 +419,17 @@
         continue;
       }
 
+      if (ghost.state === "eyes" && distance(ghost, GHOST_HOME) < 0.6) {
+        ghost.x = GHOST_HOME.x;
+        ghost.y = GHOST_HOME.y;
+        ghost.dir = DIRS.up;
+        ghost.release = 1.2;
+        ghost.exitStep = 0;
+        ghost.state = "home";
+        ghost.eaten = false;
+        continue;
+      }
+
       if (ghost.state === "leaving") {
         updateLeavingGhost(ghost, dt);
         continue;
@@ -406,15 +443,6 @@
 
       if (isCentered(ghost)) {
         snap(ghost);
-        if (ghost.state === "eyes" && distance(ghost, GHOST_HOME) < 0.5) {
-          ghost.x = GHOST_HOME.x;
-          ghost.y = GHOST_HOME.y;
-          ghost.dir = DIRS.up;
-          ghost.release = 1.2;
-          ghost.exitStep = 0;
-          ghost.state = "home";
-          continue;
-        }
         ghost.dir = chooseGhostDir(ghost);
       }
 
@@ -457,7 +485,7 @@
 
   function chooseGhostDir(ghost) {
     const target = getGhostTarget(ghost);
-    return chooseGhostDirToTarget(ghost, target, ghost.state === "eyes");
+    return chooseGhostDirToTarget(ghost, target, false);
   }
 
   function chooseGhostDirToTarget(ghost, target, allowReverse = false) {
@@ -514,7 +542,7 @@
   }
 
   function checkCollisions() {
-    if (!pacman.alive || state.mode !== "play" && state.mode !== "scatter" && state.mode !== "chase") return;
+    if (!pacman.alive || (state.mode !== "scatter" && state.mode !== "chase")) return;
 
     for (const ghost of ghosts) {
       if (ghost.state === "home" || ghost.state === "eyes") continue;
@@ -842,6 +870,13 @@
     }
 
     if (state.mode === "ready") {
+      ctx.fillStyle = COLORS.text;
+      ctx.font = "bold 22px Arial";
+      ctx.strokeStyle = "#000";
+      ctx.lineWidth = 4;
+      ctx.strokeText("Fala Familia!", WIDTH / 2, HEADER + 16 * TILE);
+      ctx.fillText("Fala Familia!", WIDTH / 2, HEADER + 16 * TILE);
+
       ctx.fillStyle = COLORS.pacman;
       ctx.font = "bold 18px Arial";
       ctx.fillText("READY!", WIDTH / 2, HEADER + 18 * TILE);
@@ -874,13 +909,6 @@
       const imgHeight = HEIGHT - 60;
       ctx.drawImage(titleImg, 0, 0, imgWidth, imgHeight);
     }
-
-    ctx.fillStyle = COLORS.text;
-    ctx.font = "bold 24px Arial";
-    ctx.strokeStyle = "#000";
-    ctx.lineWidth = 6;
-    ctx.strokeText("Fala Familia!", WIDTH / 2, HEIGHT / 2 + 35);
-    ctx.fillText("Fala Familia!", WIDTH / 2, HEIGHT / 2 + 35);
 
     ctx.fillStyle = COLORS.text;
     ctx.font = "bold 16px Arial";
